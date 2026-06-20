@@ -40,7 +40,7 @@ export default function DashboardPage() {
 
       if (res.ok) {
         setCameras((prev) =>
-          prev.map((cam) => (cam.id === id ? { ...cam, currentStage: nextStage } : cam))
+          prev.map((cam) => (cam.id === id ? { ...cam, currentStage: nextStage as any } : cam))
         );
       } else {
         console.error('Failed to update stage on database side');
