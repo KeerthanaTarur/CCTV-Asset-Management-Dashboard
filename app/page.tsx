@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { LifecycleStage } from '@prisma/client';
 import { ExtendedCamera } from '@/types/lifecycle';
 import { LIFECYCLE_STAGES } from '@/lib/constants';
 import StageColumn from '@/components/StageColumn';
@@ -30,18 +29,21 @@ export default function DashboardPage() {
     fetchCameras();
   }, []);
 
-  const handleStageChange = async (id: string, nextStage: LifecycleStage) => {
+  // Fixed endpoint and payload structure to match your backend api/cameras route exactly
+  const handleStageChange = async (id: string, nextStage: string) => {
     try {
-      const res = await fetch(`/api/cameras/${id}`, {
+      const res = await fetch('/api/cameras', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentStage: nextStage }),
+        body: JSON.stringify({ id, currentStage: nextStage }),
       });
 
       if (res.ok) {
         setCameras((prev) =>
           prev.map((cam) => (cam.id === id ? { ...cam, currentStage: nextStage } : cam))
         );
+      } else {
+        console.error('Failed to update stage on database side');
       }
     } catch (err) {
       console.error('Failed to update stage:', err);
