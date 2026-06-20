@@ -1,0 +1,64 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+
+enum LifecycleStage {
+  BUY
+  CONTRACT
+  DEPLOY
+  OPERATE
+  MAINTAIN
+  COMPLY
+  OPTIMIZE
+  RETIRE
+}
+
+model Camera {
+  id               String            @id @default(uuid())
+  name             String
+  modelNumber      String
+  macAddress       String            @unique
+  ipAddress        String
+  poeBudgetWatts   Float
+  currentStage     LifecycleStage    @default(BUY)
+  contracts        Contract[]
+  maintenanceLogs  MaintenanceLog[]
+  complianceAudits ComplianceAudit[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model MaintenanceLog {
+  id          String   @id @default(uuid())
+  cameraId    String
+  camera      Camera   @relation(fields: [cameraId], references: [id], onDelete: Cascade)
+  type        String
+  performedBy String
+  notes       String?
+  date        DateTime @default(now())
+}
+
+model Contract {
+  id          String   @id @default(uuid())
+  cameraId    String
+  camera      Camera   @relation(fields: [cameraId], references: [id], onDelete: Cascade)
+  vendor      String
+  slaTerms    String
+  warrantyExp DateTime
+}
+
+model ComplianceAudit {
+  id                  String   @id @default(uuid())
+  cameraId            String
+  camera              Camera   @relation(fields: [cameraId], references: [id], onDelete: Cascade)
+  passed              Boolean
+  checkedBy           String
+  privacyMaskVerified Boolean
+  date                DateTime @default(now())
+}
